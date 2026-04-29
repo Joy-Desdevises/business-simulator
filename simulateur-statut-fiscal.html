@@ -641,7 +641,7 @@ function runSimulation() {
 
   renderResults();
   document.getElementById('results').classList.add('visible');
-  setTimeout(() => document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ================== AFFICHAGE ==================
