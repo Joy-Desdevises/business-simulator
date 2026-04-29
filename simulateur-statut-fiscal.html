@@ -8,6 +8,16 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f4f8; color: #2d3748; font-size: 15px; }
 
+/* ── NAV ── */
+nav { background: #1e3a5f; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.nav-logo { color: white; font-weight: 800; font-size: 1.1rem; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+.nav-logo span { color: #f5820d; }
+.nav-links { display: flex; gap: 6px; }
+.nav-links a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.82rem; font-weight: 500; padding: 6px 12px; border-radius: 6px; transition: all 0.15s; }
+.nav-links a:hover { background: rgba(255,255,255,0.12); color: white; }
+.nav-links a.active { background: rgba(245,130,13,0.25); color: #f5820d; }
+@media (max-width: 600px) { .nav-links { display: none; } nav { padding: 0 16px; } }
+
 .header { background: linear-gradient(135deg, #2b4c8c 0%, #1a7f7a 100%); color: white; padding: 28px 24px; text-align: center; }
 .header h1 { font-size: 1.6rem; margin-bottom: 6px; letter-spacing: -0.3px; }
 .header p { opacity: 0.85; font-size: 0.9rem; }
@@ -149,6 +159,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 </head>
 <body>
 
+<nav>
+  <a href="index.html" class="nav-logo">📊 Business <span>Simulator</span></a>
+  <div class="nav-links">
+    <a href="index.html">Accueil</a>
+    <a href="forme-juridique.html">Forme juridique</a>
+    <a href="simulateur-statut-fiscal.html" class="active">Régime fiscal</a>
+    <a href="#">Prévisionnel</a>
+  </div>
+</nav>
+
 <div class="header">
   <h1>🏢 Simulateur Statut &amp; Régime Fiscal</h1>
   <p>Comparez Micro-Entreprise, EI au Réel et Société à l'IS en quelques secondes</p>
@@ -157,9 +177,36 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 
 <div class="container">
 
-  <!-- ÉTAPE 1 : TYPE D'ACTIVITÉ -->
+  <!-- ÉTAPE 0 : STRUCTURE JURIDIQUE -->
   <div class="card">
-    <div class="card-title"><span class="step-badge">1</span> Type d'activité</div>
+    <div class="card-title"><span class="step-badge">1</span> Votre structure juridique</div>
+    <p class="section-sub">Sélectionnez votre structure pour n'afficher que les régimes compatibles</p>
+    <div class="radio-row">
+      <div class="radio-opt">
+        <input type="radio" name="structure" id="str-all" value="all" checked>
+        <label for="str-all"><span class="icon">🔍</span> Comparer tout</label>
+      </div>
+      <div class="radio-opt">
+        <input type="radio" name="structure" id="str-ei" value="ei">
+        <label for="str-ei"><span class="icon">🧑</span> Micro / EI</label>
+      </div>
+      <div class="radio-opt">
+        <input type="radio" name="structure" id="str-eurl" value="eurl">
+        <label for="str-eurl"><span class="icon">🏢</span> EURL / SARL</label>
+      </div>
+      <div class="radio-opt">
+        <input type="radio" name="structure" id="str-sasu" value="sasu">
+        <label for="str-sasu"><span class="icon">🚀</span> SASU / SAS</label>
+      </div>
+    </div>
+    <div id="structure-info" class="info-box" style="margin-top:12px;">
+      ℹ️ Mode comparaison : les 3 régimes seront affichés. Sélectionnez votre structure pour filtrer automatiquement.
+    </div>
+  </div>
+
+  <!-- ÉTAPE 2 : TYPE D'ACTIVITÉ -->
+  <div class="card">
+    <div class="card-title"><span class="step-badge">2</span> Type d'activité</div>
     <div class="radio-row">
       <div class="radio-opt">
         <input type="radio" name="activity" id="act-service" value="service" checked>
@@ -179,9 +226,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
     </div>
   </div>
 
-  <!-- ÉTAPE 2 : CHIFFRE D'AFFAIRES -->
+  <!-- ÉTAPE 3 : CHIFFRE D'AFFAIRES -->
   <div class="card">
-    <div class="card-title"><span class="step-badge">2</span> Chiffre d'affaires prévisionnel (HT)</div>
+    <div class="card-title"><span class="step-badge">3</span> Chiffre d'affaires prévisionnel (HT)</div>
     <p class="section-sub">Entrez votre CA estimé pour les 3 premières années</p>
     <div class="form-grid">
       <div class="field">
@@ -199,9 +246,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
     </div>
   </div>
 
-  <!-- ÉTAPE 3 : CHARGES -->
+  <!-- ÉTAPE 4 : CHARGES -->
   <div class="card">
-    <div class="card-title"><span class="step-badge">3</span> Charges professionnelles annuelles</div>
+    <div class="card-title"><span class="step-badge">4</span> Charges professionnelles annuelles</div>
     <p class="section-sub">Renseignez les principales charges pour l'année 1 (les années 2 et 3 seront estimées avec +3% de hausse)</p>
     <div class="charges-grid">
       <div class="charge-item">
@@ -260,9 +307,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
     <div class="note-rate">⚠️ En micro-entreprise, vous ne déduisez pas vos charges réelles : l'abattement forfaitaire remplace cette déduction.</div>
   </div>
 
-  <!-- ÉTAPE 4 : OPTIONS -->
+  <!-- ÉTAPE 5 : OPTIONS -->
   <div class="card">
-    <div class="card-title"><span class="step-badge">4</span> Options &amp; paramètres</div>
+    <div class="card-title"><span class="step-badge">5</span> Options &amp; paramètres</div>
 
     <div style="margin-bottom:16px;">
       <label class="check-opt">
@@ -276,34 +323,57 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
     <div class="toggle-section">
       <div class="toggle-header" onclick="toggleIS()">
         <span>⚙️</span>
-        <span>Paramètres pour le régime IS (Société)</span>
+        <span>Rémunération dirigeant — Régime IS (Société)</span>
         <span id="toggle-arrow">▼</span>
       </div>
       <div class="toggle-content open" id="is-options">
         <div style="margin-top:14px;">
-          <div class="form-grid-2" style="margin-bottom:14px;">
+          <p class="section-sub" style="margin-bottom:14px;">Renseignez la rémunération brute souhaitée pour chaque année. Mettez 0 si vous souhaitez ne vous verser que des dividendes.</p>
+          <div class="form-grid" style="margin-bottom:16px;">
             <div class="field">
-              <label>Rémunération brute souhaitée (Année 1)</label>
-              <div class="euro"><input type="number" id="remunIS" value="14400" min="0" step="500"></div>
-              <span class="hint">Ce que la société vous verse chaque année (avant cotisations)</span>
+              <label>Rémunération brute — Année 1</label>
+              <div class="euro"><input type="number" id="remunIS1" value="0" min="0" step="500"></div>
+              <span class="hint">0 = dividendes uniquement</span>
             </div>
+            <div class="field">
+              <label>Rémunération brute — Année 2</label>
+              <div class="euro"><input type="number" id="remunIS2" value="45000" min="0" step="500"></div>
+            </div>
+            <div class="field">
+              <label>Rémunération brute — Année 3</label>
+              <div class="euro"><input type="number" id="remunIS3" value="45000" min="0" step="500"></div>
+            </div>
+          </div>
+          <div class="info-box" style="margin-bottom:12px;">
+            💡 <strong>Pourquoi l'IS peut être plus avantageux :</strong> l'IS permet de séparer rémunération et bénéfices. En gardant des profits en société (taxés à 15%), vous évitez l'IRPP personnel qui peut atteindre 30-41%. Les dividendes distribués sont soumis à la flat tax de 30%, souvent moins qu'un salaire.
+          </div>
+          <div class="form-grid-2">
             <div class="field">
               <label>Type de structure IS</label>
               <div class="radio-row" style="margin-top:6px;">
                 <div class="radio-opt">
                   <input type="radio" name="statut_is" id="is-tns" value="tns" checked>
-                  <label for="is-tns" style="font-size:0.82rem;">SARL/EURL<br><small style="font-weight:400;color:#718096;">Gérant TNS</small></label>
+                  <label for="is-tns" style="font-size:0.82rem;">SARL/EURL<br><small style="font-weight:400;color:#718096;">Gérant TNS (~45% cotis)</small></label>
                 </div>
                 <div class="radio-opt">
                   <input type="radio" name="statut_is" id="is-assimile" value="assimile">
-                  <label for="is-assimile" style="font-size:0.82rem;">SAS/SASU<br><small style="font-weight:400;color:#718096;">Président assimilé salarié</small></label>
+                  <label for="is-assimile" style="font-size:0.82rem;">SAS/SASU<br><small style="font-weight:400;color:#718096;">Assimilé salarié (~67% cotis)</small></label>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="info-box">
-            💡 <strong>Gérant TNS (SARL/EURL) :</strong> cotisations ~45% de la rémunération, protection sociale moindre mais moins coûteux.
-            <strong>Assimilé salarié (SAS/SASU) :</strong> cotisations ~67% de la rémunération brute (patronal + salarial), meilleure protection sociale.
+            <div class="field">
+              <label>Stratégie dividendes</label>
+              <div class="radio-row" style="margin-top:6px;">
+                <div class="radio-opt">
+                  <input type="radio" name="div_strategy" id="div-distrib" value="distribute" checked>
+                  <label for="div-distrib" style="font-size:0.82rem;">Je distribue<br><small style="font-weight:400;color:#718096;">Flat tax 30% sur dividendes</small></label>
+                </div>
+                <div class="radio-opt">
+                  <input type="radio" name="div_strategy" id="div-keep" value="keep">
+                  <label for="div-keep" style="font-size:0.82rem;">Je conserve<br><small style="font-weight:400;color:#718096;">Profits gardés en société</small></label>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -363,6 +433,21 @@ const ACTIVITY_CONFIG = {
   commerce: { cotis: 0.123, abatt: 0.71, maxCA: 188700, label: "Commerce / vente (BIC)",         abattLabel: "71%" }
 };
 
+// Structures et régimes compatibles
+const STRUCTURE_CONFIG = {
+  all:  { showMicro: true,  showIR: true,  showIS: true,  isStatut: null,   label: "Comparaison complète" },
+  ei:   { showMicro: true,  showIR: true,  showIS: false, isStatut: null,   label: "Micro / EI" },
+  eurl: { showMicro: false, showIR: false, showIS: true,  isStatut: 'tns',  label: "EURL / SARL" },
+  sasu: { showMicro: false, showIR: false, showIS: true,  isStatut: 'assimile', label: "SASU / SAS" }
+};
+
+const STRUCTURE_INFOS = {
+  all:  "ℹ️ Mode comparaison : les régimes compatibles avec chaque structure seront affichés côte à côte.",
+  ei:   "✅ Micro-Entreprise et EI au Réel sont les deux régimes disponibles pour une Entreprise Individuelle.",
+  eurl: "✅ EURL/SARL → uniquement le régime IS est affiché. Le gérant majoritaire est TNS (~45% de cotisations sur la rémunération). La micro n'est pas compatible avec une société.",
+  sasu: "✅ SASU/SAS → uniquement le régime IS est affiché. Le président est assimilé salarié (~67% de cotisations). La micro n'est pas compatible avec une société."
+};
+
 const CFE = 1000;
 let simulationResults = [];
 let currentYear = 1;
@@ -420,6 +505,18 @@ function updateChargesTotal() {
   document.getElementById('total-charges-display').textContent = fmt(total);
 }
 
+function updateStructureInfo() {
+  const str = document.querySelector('input[name="structure"]:checked')?.value || 'all';
+  const cfg = STRUCTURE_CONFIG[str];
+  document.getElementById('structure-info').textContent = STRUCTURE_INFOS[str];
+
+  // Auto-sync statut_is with structure
+  if (cfg.isStatut) {
+    const radio = document.getElementById(cfg.isStatut === 'tns' ? 'is-tns' : 'is-assimile');
+    if (radio) radio.checked = true;
+  }
+}
+
 function toggleIS() {
   const el = document.getElementById('is-options');
   const arrow = document.getElementById('toggle-arrow');
@@ -430,108 +527,106 @@ function toggleIS() {
 // ================== CALCUL PRINCIPAL ==================
 
 function runSimulation() {
-  const act = document.querySelector('input[name="activity"]:checked')?.value || 'service';
-  const acre = document.getElementById('acre').checked;
-  const statutIS = document.querySelector('input[name="statut_is"]:checked')?.value || 'tns';
-  const cfg = ACTIVITY_CONFIG[act];
+  const act    = document.querySelector('input[name="activity"]:checked')?.value || 'service';
+  const str    = document.querySelector('input[name="structure"]:checked')?.value || 'all';
+  const acre   = document.getElementById('acre').checked;
+  const divStrategy = document.querySelector('input[name="div_strategy"]:checked')?.value || 'distribute';
+  const cfg    = ACTIVITY_CONFIG[act];
+  const strCfg = STRUCTURE_CONFIG[str];
 
-  const caArr = [1,2,3].map(i => parseFloat(document.getElementById(`ca${i}`).value) || 0);
-  const remun1 = parseFloat(document.getElementById('remunIS').value) || 0;
+  // Statut IS : déduit de la structure si définie, sinon radio manuel
+  const statutIS = strCfg.isStatut || (document.querySelector('input[name="statut_is"]:checked')?.value || 'tns');
+
+  const caArr  = [1,2,3].map(i => parseFloat(document.getElementById(`ca${i}`).value) || 0);
+  // Rémunération IS par année
+  const remunArr = [
+    parseFloat(document.getElementById('remunIS1').value) || 0,
+    parseFloat(document.getElementById('remunIS2').value) || 0,
+    parseFloat(document.getElementById('remunIS3').value) || 0
+  ];
   const charges1 = getCharges1();
 
   simulationResults = [];
 
   for (let i = 0; i < 3; i++) {
-    const year = i + 1;
-    const ca = caArr[i];
-    // Charges augmentent de 3% par an (inflation)
-    const chargeFactor = Math.pow(1.03, i);
-    const charges = charges1 * chargeFactor;
-    // Rémunération IS augmente légèrement
-    const remun = remun1 * (1 + 0.05 * i);
+    const year   = i + 1;
+    const ca     = caArr[i];
+    const charges = charges1 * Math.pow(1.03, i); // +3%/an inflation
+    const remun  = remunArr[i];
 
-    // -------- MICRO --------
-    const acreFactor = (acre && year === 1) ? 0.5 : 1;
-    const microCotis = ca * cfg.cotis * acreFactor;
-    // En micro, les vraies charges sont payées mais non déductibles fiscalement
-    const microNetAvantIRPP = ca - charges - microCotis - CFE;
-    const microBaseIRPP = ca * (1 - cfg.abatt); // abattement forfaitaire
-    const microIRPP = calcIRPP(microBaseIRPP);
-    const microNetApresIRPP = microNetAvantIRPP - microIRPP;
-    const microExceeds = ca > cfg.maxCA;
-
-    // -------- IR RÉEL (EI TNS) --------
-    const brutIR = ca - charges - CFE;
-    let irCotis;
-    if (year === 1) {
-      // Forfait 1ère année (base minimale PASS × taux approximatif)
-      irCotis = Math.max(1500, Math.min(brutIR * 0.15, 5000));
-    } else {
-      // Cotisations TNS ≈ 45% du revenu net → résoudre : cotis = 0.45 × (brut - cotis)
-      // → cotis = 0.45/1.45 × brut ≈ 31% du brut
-      irCotis = Math.max(0, brutIR * 0.45 / 1.45);
+    // -------- MICRO (seulement si compatible avec la structure) --------
+    let microData = null;
+    if (strCfg.showMicro) {
+      const acreFactor = (acre && year === 1) ? 0.5 : 1;
+      const microCotis = ca * cfg.cotis * acreFactor;
+      const microNetAvantIRPP = ca - charges - microCotis - CFE;
+      const microBaseIRPP = ca * (1 - cfg.abatt);
+      const microIRPP = calcIRPP(microBaseIRPP);
+      microData = {
+        cotis: microCotis, net: microNetAvantIRPP, baseIRPP: microBaseIRPP,
+        irpp: microIRPP, netApresIRPP: microNetAvantIRPP - microIRPP,
+        exceeds: ca > cfg.maxCA, cfg
+      };
     }
-    irCotis = Math.max(0, Math.min(irCotis, brutIR));
-    const irNet = Math.max(0, brutIR - irCotis);
-    const irIRPP = calcIRPP(irNet);
-    const irNetApresIRPP = irNet - irIRPP;
+
+    // -------- IR RÉEL (seulement si compatible) --------
+    let irData = null;
+    if (strCfg.showIR) {
+      const brutIR = ca - charges - CFE;
+      let irCotis = (year === 1)
+        ? Math.max(1500, Math.min(brutIR * 0.15, 5000))
+        : Math.max(0, brutIR * 0.45 / 1.45);
+      irCotis = Math.max(0, Math.min(irCotis, brutIR));
+      const irNet = Math.max(0, brutIR - irCotis);
+      const irIRPP = calcIRPP(irNet);
+      irData = {
+        cotis: irCotis, brut: brutIR, net: irNet,
+        irpp: irIRPP, netApresIRPP: irNet - irIRPP
+      };
+    }
 
     // -------- IS --------
-    let isCotis, isRemunNet, isCompanyCost;
+    let isData = null;
+    if (strCfg.showIS) {
+      let isCotis, isRemunNet, isCompanyCost;
+      if (statutIS === 'tns') {
+        isCotis       = remun * 0.45;
+        isRemunNet    = remun - isCotis;         // 55% du brut
+        isCompanyCost = remun;                   // société déduit uniquement la rémunération
+      } else {
+        // Assimilé salarié : patronales 45% + salariales 22%
+        const patronales = remun * 0.45;
+        const salariales = remun * 0.22;
+        isCotis       = patronales + salariales;
+        isRemunNet    = remun - salariales;      // 78% du brut
+        isCompanyCost = remun + patronales;      // 145% du brut pour la société
+      }
 
-    if (statutIS === 'tns') {
-      // SARL/EURL gérant TNS majoritaire
-      // Cotisations payées par le gérant sur la rémunération (~45%)
-      isCotis = remun * 0.45;
-      isRemunNet = remun - isCotis; // 55% of gross
-      isCompanyCost = remun; // la société ne voit que la rémunération brute
-    } else {
-      // SAS/SASU président assimilé salarié
-      // Charges patronales ≈ 45% du brut (payées par la société)
-      // Charges salariales ≈ 22% du brut (déduites du brut)
-      const patronales = remun * 0.45;
-      const salariales = remun * 0.22;
-      isCotis = patronales + salariales;
-      isRemunNet = remun - salariales; // net = 78% du brut
-      isCompanyCost = remun + patronales; // société paie brut + patronales = 145%
-    }
+      const isBrutSociete = ca - charges - isCompanyCost - CFE;
+      const isImpot       = calcIS(Math.max(0, isBrutSociete));
+      const isBeneficeNet = Math.max(0, isBrutSociete) - isImpot;
+      const isDividendesNet = isBeneficeNet * 0.70; // flat tax 30%
 
-    const isBrutSociete = ca - charges - isCompanyCost - CFE;
-    const isImpot = calcIS(Math.max(0, isBrutSociete));
-    const isBeneficeNet = Math.max(0, isBrutSociete) - isImpot;
+      // IRPP sur rémunération nette (abatt 10% pour assimilé salarié)
+      const isBaseIRPP = (statutIS === 'assimile') ? Math.max(0, isRemunNet * 0.90) : isRemunNet;
+      const isIRPPSalary = calcIRPP(isBaseIRPP);
 
-    // Dividendes : flat tax 30% sur le bénéfice distribué
-    const isDividendesNet = isBeneficeNet * 0.70;
+      // Revenu total selon stratégie dividendes
+      const isRevenuTotal = (divStrategy === 'distribute')
+        ? isRemunNet - isIRPPSalary + isDividendesNet   // salaire net + dividendes après flat tax
+        : isRemunNet - isIRPPSalary + isBeneficeNet;    // salaire net + valeur brute conservée en société
 
-    // IRPP sur la rémunération nette
-    const isBaseIRPP = (statutIS === 'assimile') ? isRemunNet * 0.90 : isRemunNet; // 10% abatt salarié
-    const isIRPPSalary = calcIRPP(isBaseIRPP);
-
-    // Revenu total disponible immédiat (avant dividendes)
-    const isRevenuImmediat = isRemunNet;
-    // Revenu total si dividendes distribués intégralement (optionnel)
-    const isRevenuTotal = isRemunNet - isIRPPSalary + isDividendesNet;
-
-    simulationResults.push({
-      year, ca, charges,
-      micro: {
-        cotis: microCotis, net: microNetAvantIRPP, baseIRPP: microBaseIRPP,
-        irpp: microIRPP, netApresIRPP: microNetApresIRPP,
-        exceeds: microExceeds, cfg
-      },
-      ir: {
-        cotis: irCotis, brut: brutIR, net: irNet,
-        irpp: irIRPP, netApresIRPP: irNetApresIRPP
-      },
-      is: {
+      isData = {
         remunBrute: remun, cotis: isCotis, remunNet: isRemunNet,
         companyCost: isCompanyCost, brutSociete: isBrutSociete,
         impotIS: isImpot, beneficeNet: isBeneficeNet,
         dividendesNet: isDividendesNet, irppSalary: isIRPPSalary,
-        revenuImmediat: isRevenuImmediat, revenuTotal: isRevenuTotal,
-        statut: statutIS
-      }
-    });
+        revenuTotal: isRevenuTotal, statut: statutIS,
+        divStrategy
+      };
+    }
+
+    simulationResults.push({ year, ca, charges, micro: microData, ir: irData, is: isData, strCfg });
   }
 
   renderResults();
@@ -558,30 +653,36 @@ function renderYearResults() {
   const data = simulationResults[currentYear - 1];
   if (!data) return;
 
-  // Déterminer le gagnant (revenu disponible avant IRPP)
-  const nets = {
-    micro: data.micro.net,
-    ir: data.ir.net,
-    is: data.is.revenuTotal
-  };
-  const winner = Object.entries(nets).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+  // Construire les scores uniquement sur les régimes actifs
+  const nets = {};
+  if (data.micro) nets.micro = data.micro.net;
+  if (data.ir)    nets.ir    = data.ir.net;
+  if (data.is)    nets.is    = data.is.revenuTotal;
+
+  const winner = Object.keys(nets).length
+    ? Object.entries(nets).reduce((a, b) => a[1] > b[1] ? a : b)[0]
+    : null;
 
   // ---- CARDS ----
   const grid = document.getElementById('results-grid');
-  grid.innerHTML = `
-    ${renderMicroCard(data, winner === 'micro')}
-    ${renderIRCard(data, winner === 'ir')}
-    ${renderISCard(data, winner === 'is')}
-  `;
+  // Ajuster la grille selon le nombre de régimes affichés
+  const count = Object.keys(nets).length;
+  grid.style.gridTemplateColumns = count === 1 ? '1fr' : count === 2 ? '1fr 1fr' : 'repeat(3, 1fr)';
+
+  grid.innerHTML = [
+    data.micro ? renderMicroCard(data, winner === 'micro') : '',
+    data.ir    ? renderIRCard(data, winner === 'ir')       : '',
+    data.is    ? renderISCard(data, winner === 'is')       : ''
+  ].join('');
 
   // ---- BARS ----
-  const maxNet = Math.max(data.micro.net, data.ir.net, data.is.revenuTotal, 1);
+  const maxNet = Math.max(...Object.values(nets), 1);
   const bars = document.getElementById('bars-container');
-  bars.innerHTML = `
-    ${renderBar('Micro-Entreprise', data.micro.net, maxNet, 'micro')}
-    ${renderBar('EI Réel (IR)', data.ir.net, maxNet, 'ir')}
-    ${renderBar('IS (rémun. + bénéf.)', data.is.revenuTotal, maxNet, 'is')}
-  `;
+  bars.innerHTML = [
+    data.micro ? renderBar('Micro-Entreprise', data.micro.net, maxNet, 'micro') : '',
+    data.ir    ? renderBar('EI Réel (IR)',     data.ir.net,    maxNet, 'ir')    : '',
+    data.is    ? renderBar(data.is.divStrategy === 'keep' ? 'IS (salaire + valeur société)' : 'IS (salaire + dividendes)', data.is.revenuTotal, maxNet, 'is') : ''
+  ].join('');
 }
 
 function renderMicroCard(data, isWinner) {
@@ -664,17 +765,16 @@ function renderRecommendation() {
   const data = simulationResults[currentYear - 1];
   if (!data) return;
 
-  // Compare year 1 net after IRPP
-  const microScore = data.micro.netApresIRPP;
-  const irScore = data.ir.netApresIRPP;
-  const isScore = data.is.revenuTotal;
+  const scores = {};
+  if (data.micro) scores.micro = data.micro.netApresIRPP;
+  if (data.ir)    scores.ir    = data.ir.netApresIRPP;
+  if (data.is)    scores.is    = data.is.revenuTotal;
 
-  let bestKey = 'micro', bestScore = microScore;
-  if (irScore > bestScore) { bestKey = 'ir'; bestScore = irScore; }
-  if (isScore > bestScore) { bestKey = 'is'; bestScore = isScore; }
+  if (!Object.keys(scores).length) return;
+  const bestKey = Object.entries(scores).reduce((a, b) => a[1] > b[1] ? a : b)[0];
 
   const act = document.querySelector('input[name="activity"]:checked')?.value || 'service';
-  const microExceeds = simulationResults.some(r => r.micro.exceeds);
+  const microExceeds = simulationResults.some(r => r.micro && r.micro.exceeds);
 
   const recos = {
     micro: {
@@ -733,6 +833,10 @@ document.querySelectorAll('input[name="activity"]').forEach(r => {
   r.addEventListener('change', updateCeilingDisplay);
 });
 
+document.querySelectorAll('input[name="structure"]').forEach(r => {
+  r.addEventListener('change', updateStructureInfo);
+});
+
 const chargeIds = ['ch-carburant','ch-fournitures','ch-loyer','ch-assurance','ch-tel','ch-com','ch-ec','ch-doc','ch-banque','ch-entretien','ch-recep','ch-autres'];
 chargeIds.forEach(id => {
   document.getElementById(id).addEventListener('input', updateChargesTotal);
@@ -741,6 +845,7 @@ chargeIds.forEach(id => {
 // Init
 updateCeilingDisplay();
 updateChargesTotal();
+updateStructureInfo();
 
 // Auto-run with default values on load
 window.addEventListener('DOMContentLoaded', () => {
