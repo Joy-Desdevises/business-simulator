@@ -445,17 +445,17 @@ const ACTIVITY_CONFIG = {
 
 // Structures et régimes compatibles
 const STRUCTURE_CONFIG = {
-  all:  { showMicro: true,  showIR: true,  showIS: true,  isStatut: null,   label: "Comparaison complète" },
-  ei:   { showMicro: true,  showIR: true,  showIS: false, isStatut: null,   label: "Micro / EI" },
-  eurl: { showMicro: false, showIR: false, showIS: true,  isStatut: 'tns',  label: "EURL / SARL" },
-  sasu: { showMicro: false, showIR: false, showIS: true,  isStatut: 'assimile', label: "SASU / SAS" }
+  all:  { showMicro: true,  showIR: true,  showIS: true,  isStatut: null,       label: "Comparaison complète" },
+  ei:   { showMicro: true,  showIR: true,  showIS: false, isStatut: null,       label: "Micro / EI" },
+  eurl: { showMicro: false, showIR: true,  showIS: true,  isStatut: 'tns',      label: "EURL / SARL" },
+  sasu: { showMicro: false, showIR: true,  showIS: true,  isStatut: 'assimile', label: "SASU / SAS" }
 };
 
 const STRUCTURE_INFOS = {
-  all:  "ℹ️ Mode comparaison : les régimes compatibles avec chaque structure seront affichés côte à côte.",
+  all:  "ℹ️ Mode comparaison : les 3 régimes sont affichés côte à côte.",
   ei:   "✅ Micro-Entreprise et EI au Réel sont les deux régimes disponibles pour une Entreprise Individuelle.",
-  eurl: "✅ EURL/SARL → uniquement le régime IS est affiché. Le gérant majoritaire est TNS (~45% de cotisations sur la rémunération). La micro n'est pas compatible avec une société.",
-  sasu: "✅ SASU/SAS → uniquement le régime IS est affiché. Le président est assimilé salarié (~67% de cotisations). La micro n'est pas compatible avec une société."
+  eurl: "ℹ️ EURL (associé unique personne physique) : l'IR est le régime par défaut (bénéfices imposés directement). L'IS est une option. La micro n'est pas compatible avec une société.",
+  sasu: "ℹ️ SASU : l'IS est le régime par défaut. L'IR est possible en option pour 5 ans maximum (art. 239 bis AB), sous conditions (société < 5 ans, CA < 10M€, < 50 salariés). La micro n'est pas compatible avec une société."
 };
 
 const CFE = 1000;
@@ -641,7 +641,6 @@ function runSimulation() {
 
   renderResults();
   document.getElementById('results').classList.add('visible');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ================== AFFICHAGE ==================
@@ -752,10 +751,17 @@ function renderBarDisabled(label) {
 
 function renderIRCard(data, isWinner) {
   const ir = data.ir;
+  const str = document.querySelector('input[name="structure"]:checked')?.value || 'all';
+  const irNote = str === 'eurl'
+    ? '<div style="font-size:0.72rem;color:#c05621;font-weight:600;margin-bottom:8px;">EURL — régime IR par défaut (option IS possible)</div>'
+    : str === 'sasu'
+    ? '<div style="font-size:0.72rem;color:#c05621;font-weight:600;margin-bottom:8px;">SASU — option IR max 5 ans (art. 239 bis AB)</div>'
+    : '';
   return `
     <div class="res-card ir ${isWinner ? 'winner' : ''}">
       ${isWinner ? '<div class="winner-badge">🏆 Meilleur revenu</div>' : ''}
-      <div class="res-title">🟠 EI Réel (IR)</div>
+      <div class="res-title">🟠 EI / Société à l'IR</div>
+      ${irNote}
       <div class="metric-row"><span class="metric-label">CA</span><span class="metric-val">${fmt(data.ca)}</span></div>
       <div class="metric-row"><span class="metric-label">Charges déductibles</span><span class="metric-val red">− ${fmt(data.charges)}</span></div>
       <div class="metric-row"><span class="metric-label">CFE</span><span class="metric-val red">− ${fmt(CFE)}</span></div>
