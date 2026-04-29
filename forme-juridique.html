@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choisir ma forme juridique — Business Simulator</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #1e3a5f; }
+
+/* NAV */
+nav { background: #1e3a5f; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.nav-logo { color: white; font-weight: 800; font-size: 1.1rem; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+.nav-logo span { color: #f5820d; }
+.nav-links { display: flex; gap: 6px; }
+.nav-links a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.82rem; font-weight: 500; padding: 6px 12px; border-radius: 6px; transition: all 0.15s; }
+.nav-links a:hover { background: rgba(255,255,255,0.12); color: white; }
+.nav-links a.active { background: rgba(245,130,13,0.25); color: #f5820d; }
+
+/* PAGE HEADER */
+.page-header { background: linear-gradient(135deg, #1e3a5f 0%, #0f6b6b 100%); color: white; padding: 40px 24px 44px; text-align: center; }
+.page-header .breadcrumb { font-size: 0.78rem; opacity: 0.6; margin-bottom: 12px; }
+.page-header h1 { font-size: 1.9rem; font-weight: 800; margin-bottom: 8px; }
+.page-header p { font-size: 0.9rem; opacity: 0.8; max-width: 480px; margin: 0 auto; line-height: 1.6; }
+
+/* CONTAINER */
+.container { max-width: 680px; margin: 0 auto; padding: 36px 20px 60px; }
+
+/* PROGRESS */
+.progress-bar { background: #e2e8f0; border-radius: 20px; height: 6px; margin-bottom: 8px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #1e3a5f, #f5820d); border-radius: 20px; transition: width 0.4s ease; }
+.progress-label { font-size: 0.75rem; color: #5a7a9f; text-align: right; margin-bottom: 28px; }
+
+/* QUESTION CARD */
+.question-card { background: white; border-radius: 16px; padding: 36px 32px; box-shadow: 0 4px 20px rgba(30,58,95,0.08); animation: slideIn 0.3s ease; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+.question-tag { font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #f5820d; margin-bottom: 12px; }
+.question-text { font-size: 1.3rem; font-weight: 800; color: #1e3a5f; margin-bottom: 8px; line-height: 1.3; }
+.question-sub { font-size: 0.85rem; color: #5a7a9f; margin-bottom: 28px; line-height: 1.5; }
+
+/* ANSWER BUTTONS */
+.answers { display: flex; flex-direction: column; gap: 12px; }
+.answer-btn { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border: 2.5px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: all 0.18s; background: white; text-align: left; width: 100%; }
+.answer-btn:hover { border-color: #1e3a5f; background: #f0f5ff; transform: translateX(4px); }
+.answer-btn .btn-icon { font-size: 1.4rem; flex-shrink: 0; width: 32px; text-align: center; }
+.answer-btn .btn-text { flex: 1; }
+.answer-btn .btn-label { font-size: 0.95rem; font-weight: 700; color: #1e3a5f; display: block; }
+.answer-btn .btn-hint { font-size: 0.78rem; color: #5a7a9f; display: block; margin-top: 2px; }
+.answer-btn .btn-arrow { color: #c0cfe0; font-size: 1.1rem; flex-shrink: 0; }
+.answer-btn:hover .btn-arrow { color: #f5820d; }
+
+/* BACK BUTTON */
+.back-btn { display: inline-flex; align-items: center; gap: 6px; color: #5a7a9f; font-size: 0.82rem; font-weight: 600; cursor: pointer; margin-bottom: 20px; padding: 6px 0; border: none; background: none; transition: color 0.15s; }
+.back-btn:hover { color: #1e3a5f; }
+
+/* RESULT CARD */
+.result-card { border-radius: 16px; padding: 36px 32px; animation: slideIn 0.35s ease; }
+.result-card.green { background: linear-gradient(135deg, #f0fff4, #e6ffec); border: 2.5px solid #68d391; }
+.result-card.blue { background: linear-gradient(135deg, #ebf8ff, #e0f0ff); border: 2.5px solid #63b3ed; }
+.result-card.orange { background: linear-gradient(135deg, #fffaf0, #fff3e0); border: 2.5px solid #f6ad55; }
+.result-card.red { background: linear-gradient(135deg, #fff5f5, #ffe8e8); border: 2.5px solid #fc8181; }
+.result-card.purple { background: linear-gradient(135deg, #faf5ff, #f0e8ff); border: 2.5px solid #b794f4; }
+
+.result-badge { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+.result-card.green .result-badge { background: #c6f6d5; color: #276749; }
+.result-card.blue .result-badge { background: #bee3f8; color: #2b6cb0; }
+.result-card.orange .result-badge { background: #feebc8; color: #c05621; }
+.result-card.red .result-badge { background: #fed7d7; color: #c53030; }
+.result-card.purple .result-badge { background: #e9d8fd; color: #553c9a; }
+
+.result-name { font-size: 2rem; font-weight: 900; margin-bottom: 4px; }
+.result-card.green .result-name { color: #276749; }
+.result-card.blue .result-name { color: #2b4c8c; }
+.result-card.orange .result-name { color: #c05621; }
+.result-card.red .result-name { color: #c53030; }
+.result-card.purple .result-name { color: #553c9a; }
+
+.result-subtitle { font-size: 0.9rem; color: #5a7a9f; margin-bottom: 24px; font-weight: 500; }
+
+.result-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.tag { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; background: rgba(0,0,0,0.06); color: #4a5568; }
+
+.result-desc { font-size: 0.88rem; color: #4a5568; line-height: 1.8; margin-bottom: 24px; }
+
+.pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+.pros, .cons { border-radius: 10px; padding: 16px; }
+.pros { background: rgba(72,187,120,0.1); }
+.cons { background: rgba(245,101,101,0.1); }
+.pros h4, .cons h4 { font-size: 0.8rem; font-weight: 800; margin-bottom: 10px; }
+.pros h4 { color: #276749; }
+.cons h4 { color: #c53030; }
+.pros ul, .cons ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.pros li, .cons li { font-size: 0.78rem; color: #4a5568; display: flex; gap: 6px; line-height: 1.4; }
+.pros li::before { content: "✓"; color: #48bb78; font-weight: 800; flex-shrink: 0; }
+.cons li::before { content: "✗"; color: #fc8181; font-weight: 800; flex-shrink: 0; }
+
+.warning-box { background: #fffbeb; border: 1.5px solid #f6ad55; border-radius: 10px; padding: 12px 16px; font-size: 0.8rem; color: #744210; line-height: 1.6; margin-bottom: 20px; }
+
+.result-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-primary { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #1e3a5f, #0f6b6b); color: white; padding: 12px 22px; border-radius: 10px; font-weight: 700; font-size: 0.88rem; text-decoration: none; transition: opacity 0.2s, transform 0.1s; border: none; cursor: pointer; }
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: white; color: #1e3a5f; padding: 12px 22px; border-radius: 10px; font-weight: 700; font-size: 0.88rem; text-decoration: none; border: 2px solid #e2e8f0; transition: all 0.2s; cursor: pointer; }
+.btn-secondary:hover { border-color: #1e3a5f; }
+
+/* FOOTER */
+footer { background: #1e3a5f; color: rgba(255,255,255,0.5); text-align: center; padding: 24px; font-size: 0.78rem; }
+footer strong { color: white; }
+
+@media (max-width: 600px) {
+  .question-card, .result-card { padding: 24px 20px; }
+  .pros-cons { grid-template-columns: 1fr; }
+  nav { padding: 0 16px; }
+  .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">📊 Business <span>Simulator</span></a>
+  <div class="nav-links">
+    <a href="index.html">Accueil</a>
+    <a href="forme-juridique.html" class="active">Forme juridique</a>
+    <a href="simulateur-statut-fiscal.html">Régime fiscal</a>
+    <a href="#">Prévisionnel</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="breadcrumb">Accueil › Je crée mon entreprise › Forme juridique</div>
+  <h1>🏛️ Quelle forme juridique choisir ?</h1>
+  <p>Répondez à quelques questions simples et obtenez une recommandation personnalisée parmi 9 structures possibles.</p>
+</div>
+
+<div class="container">
+  <div id="progress-section">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="progress-label" id="progress-label">Question 1 sur 5</div>
+  </div>
+
+  <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← Revenir en arrière</button>
+
+  <div id="quiz-area"></div>
+</div>
+
+<footer>
+  <strong>Business Simulator</strong> — Source : Bpifrance Création • Taux 2026 • À titre indicatif<br>
+  <span style="margin-top:6px;display:block;">Consultez un expert-comptable ou votre CCI avant toute décision définitive</span>
+</footer>
+
+<script>
+// ══════════════════════════════════════════════
+//  ARBRE DE DÉCISION
+// ══════════════════════════════════════════════
+
+const TREE = {
+  q1: {
+    tag: "Question 1 — Le projet",
+    question: "Ton projet est-il lucratif ?",
+    sub: "L'objectif est-il de générer des revenus sur un marché, ou de servir l'intérêt général ?",
+    progress: 20,
+    label: "Q1 sur 5",
+    answers: [
+      { icon: "✅", label: "Oui, mon projet est lucratif", hint: "Je veux générer des revenus et me rémunérer", next: "q2" },
+      { icon: "🤝", label: "Non / Intérêt général", hint: "Mon projet sert une cause, sans but de profit personnel", next: "r_association" },
+      { icon: "🔄", label: "Projet coopératif", hint: "Les salariés sont aussi associés du projet", next: "r_scop" },
+    ]
+  },
+  q2: {
+    tag: "Question 2 — La structure",
+    question: "Tu crées seul·e ou avec des associés ?",
+    sub: "Dès 2 fondateurs, la création d'une société devient obligatoire.",
+    progress: 40,
+    label: "Q2 sur 5",
+    answers: [
+      { icon: "🧑", label: "Seul·e", hint: "Je suis le·la seul·e créateur·trice", next: "q3_solo" },
+      { icon: "👥", label: "Avec des associés", hint: "Nous sommes au moins 2 fondateurs", next: "q3_associes" },
+    ]
+  },
+  q3_solo: {
+    tag: "Question 3 — Le chiffre d'affaires",
+    question: "Quel CA annuel tu anticipes ?",
+    sub: "Le seuil micro-entreprise est fixé à 77 700 €/an pour les services et professions libérales (188 700 € pour le commerce).",
+    progress: 55,
+    label: "Q3 sur 5",
+    answers: [
+      { icon: "📉", label: "Moins de 77 700 €/an", hint: "Activité débutante ou complémentaire", next: "q4_solo_small" },
+      { icon: "📈", label: "Plus de 77 700 €/an", hint: "Activité principale avec un CA significatif", next: "q4_solo_big" },
+    ]
+  },
+  q4_solo_small: {
+    tag: "Question 4 — La priorité",
+    question: "Quelle est ta priorité ?",
+    sub: "Image professionnelle, protection du patrimoine ou simplicité maximale ?",
+    progress: 70,
+    label: "Q4 sur 5",
+    answers: [
+      { icon: "😌", label: "Simplicité avant tout", hint: "Je veux démarrer vite, sans complications administratives", next: "q5_frais" },
+      { icon: "🛡️", label: "Image pro ou protection", hint: "Je veux une structure sérieuse ou protéger mon patrimoine", next: "r_ei_reel_warn" },
+    ]
+  },
+  q5_frais: {
+    tag: "Question 5 — Les charges",
+    question: "As-tu des frais professionnels importants ?",
+    sub: "Loyer, matériel, déplacements, sous-traitance… Si tes charges dépassent l'abattement forfaitaire micro (34% à 71%), le réel est plus intéressant.",
+    progress: 90,
+    label: "Q5 sur 5",
+    answers: [
+      { icon: "💡", label: "Non, peu de frais", hint: "Mes charges sont faibles ou nulles", next: "r_micro" },
+      { icon: "💼", label: "Oui, des frais significatifs", hint: "Mes charges réelles sont importantes", next: "r_ei_reel" },
+    ]
+  },
+  q4_solo_big: {
+    tag: "Question 4 — La stratégie fiscale",
+    question: "Quelle est ta priorité fiscale et patrimoniale ?",
+    sub: "Au-delà du seuil micro, le choix de la structure impacte significativement ta fiscalité.",
+    progress: 70,
+    label: "Q4 sur 5",
+    answers: [
+      { icon: "⚠️", label: "Je reste en EI quand même", hint: "Je préfère la simplicité malgré le CA élevé", next: "r_ei_reel_warn" },
+      { icon: "🏦", label: "Protéger mon patrimoine et optimiser", hint: "Je veux séparer mes biens personnels et professionnels", next: "q5_protection" },
+    ]
+  },
+  q5_protection: {
+    tag: "Question 5 — Le niveau de protection",
+    question: "Mieux protégé ou payer moins de charges ?",
+    sub: "La SASU offre le régime assimilé-salarié (meilleure protection sociale). L'EURL offre le régime TNS (moins de charges).",
+    progress: 90,
+    label: "Q5 sur 5",
+    answers: [
+      { icon: "🛡️", label: "Mieux protégé (assimilé salarié)", hint: "Protection sociale proche d'un salarié, flat tax 30% sur dividendes", next: "r_sasu" },
+      { icon: "💰", label: "Payer moins de charges (TNS)", hint: "Cotisations moins élevées, dividendes PFU 31,4%", next: "r_eurl" },
+    ]
+  },
+  q3_associes: {
+    tag: "Question 3 — La croissance",
+    question: "Envisages-tu une levée de fonds ?",
+    sub: "Les investisseurs professionnels (VC, fonds) préfèrent les SAS/SA pour leur flexibilité statutaire.",
+    progress: 55,
+    label: "Q3 sur 5",
+    answers: [
+      { icon: "🚀", label: "Oui, levée de fonds prévue", hint: "Investisseurs, croissance externe, scale-up", next: "q4_fonds" },
+      { icon: "🏪", label: "Non, autofinancement", hint: "On se finance par notre propre activité", next: "q4_no_fonds" },
+    ]
+  },
+  q4_fonds: {
+    tag: "Question 4 — L'ambition",
+    question: "Quelle est l'ambition de taille du projet ?",
+    sub: "La SA est obligatoire pour les très grandes structures cotées. La SAS suffit pour la plupart des startups.",
+    progress: 75,
+    label: "Q4 sur 5",
+    answers: [
+      { icon: "🦄", label: "Startup / scale-up", hint: "Croissance rapide, nombreux investisseurs potentiels", next: "r_sas" },
+      { icon: "🏭", label: "Grande structure", hint: "Capital important, potentiellement cotée en bourse", next: "r_sa" },
+    ]
+  },
+  q4_no_fonds: {
+    tag: "Question 4 — La structure de gestion",
+    question: "Tu préfères flexibilité ou cadre strict ?",
+    sub: "La SAS laisse une grande liberté statutaire. La SARL a un cadre plus réglementé mais est plus répandue.",
+    progress: 75,
+    label: "Q4 sur 5",
+    answers: [
+      { icon: "🎯", label: "Flexibilité statutaire", hint: "On veut organiser librement notre gouvernance", next: "r_sas" },
+      { icon: "📋", label: "Cadre strict et balisé", hint: "On préfère un fonctionnement réglementé et codifié", next: "q5_resp" },
+    ]
+  },
+  q5_resp: {
+    tag: "Question 5 — La responsabilité",
+    question: "La responsabilité illimitée est-elle acceptable ?",
+    sub: "Dans une SNC, les associés sont responsables indéfiniment et solidairement des dettes de la société sur leurs biens personnels.",
+    progress: 90,
+    label: "Q5 sur 5",
+    answers: [
+      { icon: "🛡️", label: "Non, je veux protéger mon patrimoine", hint: "Ma responsabilité doit être limitée à mes apports", next: "r_sarl" },
+      { icon: "🤝", label: "Oui, on accepte la responsabilité totale", hint: "⚠️ Cas très spécifique (professions libérales réglementées, etc.)", next: "r_snc" },
+    ]
+  }
+};
+
+// ══════════════════════════════════════════════
+//  RÉSULTATS
+// ══════════════════════════════════════════════
+
+const RESULTS = {
+  r_micro: {
+    color: "green",
+    name: "Micro-Entreprise",
+    subtitle: "EI avec option micro — Régime simplifié IR",
+    tags: ["IR forfaitaire", "TNS", "CA < 77 700 €", "Abattement forfaitaire"],
+    desc: "La micro-entreprise est idéale pour démarrer simplement. Pas de comptabilité complexe, des cotisations calculées directement en % du CA, et une gestion administrative ultra-légère. C'est le régime parfait pour tester un projet ou exercer une activité complémentaire.",
+    pros: ["Démarrage immédiat et gratuit", "Pas de comptabilité obligatoire", "Cotisations calculées sur le CA (pas de résultat)", "Idéal pour activité principale ou complémentaire"],
+    cons: ["Charges réelles non déductibles", "Plafond CA à 77 700 €/an (services)", "Protection sociale moins complète", "Pas de TVA déductible"],
+    warning: null,
+    nextTools: [{ label: "📊 Simuler mon régime fiscal", href: "simulateur-statut-fiscal.html" }]
+  },
+  r_ei_reel: {
+    color: "blue",
+    name: "EI au Réel",
+    subtitle: "Entreprise Individuelle — Régime réel IR ou option IS",
+    tags: ["IR ou option IS", "TNS", "Charges déductibles", "Comptabilité obligatoire"],
+    desc: "L'EI au régime réel te permet de déduire toutes tes charges professionnelles, ce qui est avantageux si tes dépenses sont importantes. Tu restes travailleur non salarié (TNS), avec des cotisations calculées sur ton bénéfice réel.",
+    pros: ["Toutes les charges réelles déductibles", "Option IS possible pour optimiser la fiscalité", "Statut simple sans capital minimum", "Bénéfice = revenu = rémunération"],
+    cons: ["Comptabilité obligatoire (expert-comptable recommandé)", "Patrimoine personnel non protégé (sauf EIRL)", "Cotisations TNS sur le bénéfice (peut être élevé)", "Moins de visibilité qu'une société"],
+    warning: null,
+    nextTools: [{ label: "📊 Simuler mon régime fiscal", href: "simulateur-statut-fiscal.html" }]
+  },
+  r_ei_reel_warn: {
+    color: "orange",
+    name: "EI au Réel",
+    subtitle: "Possible, mais fiscalement sous-optimale ⚠️",
+    tags: ["IR", "TNS", "Sous-optimal", "À reconsidérer"],
+    desc: "L'EI au réel reste possible dans cette situation, mais elle n'est pas la structure la plus avantageuse. Au-delà du seuil micro et avec un besoin de protection, une structure sociétaire (SASU ou EURL) serait plus pertinente.",
+    pros: ["Simple à créer", "Pas de capital minimum", "Gestion simplifiée"],
+    cons: ["Patrimoine personnel non protégé", "Fiscalement sous-optimal au-delà de 77 700 €", "Moins de crédibilité qu'une société", "Difficile de s'associer plus tard"],
+    warning: "⚠️ Dans votre situation, envisagez sérieusement une SASU ou une EURL pour protéger votre patrimoine et optimiser votre fiscalité.",
+    nextTools: [{ label: "📊 Simuler mon régime fiscal", href: "simulateur-statut-fiscal.html" }]
+  },
+  r_sasu: {
+    color: "green",
+    name: "SASU",
+    subtitle: "Société par Actions Simplifiée Unipersonnelle — IS",
+    tags: ["IS", "Assimilé-salarié", "Dividendes flat tax 30%", "Patrimoine protégé"],
+    desc: "La SASU est la forme préférée des entrepreneurs solo qui veulent une structure sérieuse avec une bonne protection sociale. Le président est assimilé-salarié, ce qui lui donne une couverture sociale proche d'un employé. Les dividendes sont taxés à la flat tax de 30%.",
+    pros: ["Patrimoine personnel protégé", "Régime assimilé-salarié (bonne protection sociale)", "Dividendes flat tax 30%", "Crédibilité auprès des partenaires et banques", "Facile d'ouvrir le capital plus tard"],
+    cons: ["Charges sociales plus élevées (assimilé-salarié)", "Comptabilité et obligations annuelles", "Coût de création et gestion plus élevé", "IS sur les bénéfices non distribués"],
+    warning: null,
+    nextTools: [{ label: "📊 Simuler mon régime fiscal", href: "simulateur-statut-fiscal.html" }]
+  },
+  r_eurl: {
+    color: "green",
+    name: "EURL",
+    subtitle: "Entreprise Unipersonnelle à Responsabilité Limitée — IR ou IS",
+    tags: ["IR par défaut / IS option", "TNS", "PFU 31,4%", "Patrimoine protégé"],
+    desc: "L'EURL combine la protection patrimoniale d'une société avec les cotisations TNS, moins élevées que l'assimilé-salarié. C'est le choix idéal si tu veux optimiser tes charges sociales tout en protégeant tes biens personnels.",
+    pros: ["Patrimoine personnel protégé", "Cotisations TNS moins élevées que SASU", "IR par défaut (option IS possible)", "Capital social libre (à partir de 1 €)"],
+    cons: ["Dividendes soumis aux cotisations sociales au-delà de 10% du capital", "PFU 31,4% sur dividendes (vs 30% SASU)", "Comptabilité obligatoire", "Moins flexible que la SASU pour ouvrir le capital"],
+    warning: null,
+    nextTools: [{ label: "📊 Simuler mon régime fiscal", href: "simulateur-statut-fiscal.html" }]
+  },
+  r_sas: {
+    color: "green",
+    name: "SAS",
+    subtitle: "Société par Actions Simplifiée — IS",
+    tags: ["IS", "Assimilé-salarié", "Statuts libres", "Levée de fonds facilitée"],
+    desc: "La SAS est la structure la plus flexible pour les projets avec associés. Ses statuts sont librement organisables, ce qui facilite l'entrée d'investisseurs. Les dirigeants sont assimilés-salariés. C'est le choix des startups et des projets à forte croissance.",
+    pros: ["Statuts libres et très flexibles", "Levée de fonds simplifiée", "Présidents assimilés-salariés", "Flat tax 30% sur dividendes", "Idéale pour plusieurs associés"],
+    cons: ["Charges sociales assimilé-salarié élevées", "Comptabilité et obligations annuelles", "Pas de régime micro possible", "Coût de création et de gestion"],
+    warning: null,
+    nextTools: [{ label: "📊 Simuler mon régime fiscal", href: "simulateur-statut-fiscal.html" }]
+  },
+  r_sarl: {
+    color: "green",
+    name: "SARL",
+    subtitle: "Société à Responsabilité Limitée — IS",
+    tags: ["IS", "TNS si gérant maj.", "PFU 31,4%", "Cadre réglementé"],
+    desc: "La SARL est la forme sociétaire la plus répandue en France. Son fonctionnement est strictement encadré par la loi. Le régime social du gérant dépend de sa position : majoritaire = TNS, minoritaire ou égalitaire = assimilé-salarié.",
+    pros: ["Structure bien connue des banques et partenaires", "Patrimoine des associés protégé", "Gérant majoritaire = TNS (moins de charges)", "Capital social libre"],
+    cons: ["Moins flexible que la SAS", "Dividendes soumis aux cotisations sociales (PFU 31,4%)", "Modification des statuts plus contraignante", "Moins attractive pour les investisseurs"],
+    warning: null,
+    nextTools: [{ label: "📊 Simuler mon régime fiscal", href: "simulateur-statut-fiscal.html" }]
+  },
+  r_sa: {
+    color: "blue",
+    name: "SA",
+    subtitle: "Société Anonyme — IS",
+    tags: ["IS", "Capital min. 37 000 €", "CAC obligatoire", "Grande structure"],
+    desc: "La SA est réservée aux grandes structures ou aux sociétés qui envisagent une cotation en bourse. Elle nécessite un capital minimum de 37 000 €, au moins 2 actionnaires et un commissaire aux comptes obligatoire.",
+    pros: ["Structure adaptée aux très grandes entreprises", "Cotation en bourse possible", "Gouvernance claire avec CA ou directoire", "Crédibilité maximale"],
+    cons: ["Capital minimum 37 000 €", "Commissaire aux comptes obligatoire", "Gestion très lourde administrativement", "Réservée aux structures importantes"],
+    warning: "💡 Dans la plupart des cas de création, une SAS sera plus adaptée. La SA est vraiment réservée aux grandes structures.",
+    nextTools: []
+  },
+  r_snc: {
+    color: "red",
+    name: "SNC",
+    subtitle: "Société en Nom Collectif — Responsabilité illimitée ⚠️",
+    tags: ["IR", "Responsabilité illimitée", "Solidaire", "Cas très spécifiques"],
+    desc: "La SNC est une structure très particulière où chaque associé est responsable indéfiniment et solidairement de toutes les dettes de la société sur l'ensemble de ses biens personnels. Elle est réservée à des cas très spécifiques.",
+    pros: ["Pas de capital minimum", "Fonctionnement simple entre associés de confiance", "IR par défaut"],
+    cons: ["Responsabilité ILLIMITÉE et solidaire sur biens personnels", "Très risqué en cas de difficultés", "Difficile d'obtenir des financements", "Quasiment abandonnée en pratique"],
+    warning: "⚠️ ATTENTION : La SNC est à éviter dans presque tous les cas. Chaque associé engage l'intégralité de ses biens personnels. Consultez impérativement un expert avant de choisir cette structure.",
+    nextTools: []
+  },
+  r_association: {
+    color: "purple",
+    name: "Association (loi 1901)",
+    subtitle: "Structure non lucrative — Intérêt général",
+    tags: ["Non lucratif", "Loi 1901", "Bénévoles", "Pas de partage de bénéfices"],
+    desc: "L'association loi 1901 est la structure adaptée aux projets sans but lucratif. Les bénéfices ne peuvent pas être distribués aux membres. Elle peut cependant employer des salariés et percevoir des subventions.",
+    pros: ["Création simple et gratuite", "Peut employer des salariés", "Éligible aux subventions publiques", "Statut reconnu et valorisé"],
+    cons: ["Aucun partage de bénéfices entre membres", "Pas adapté pour se rémunérer via les bénéfices", "Gouvernance collective (AG obligatoire)", "Fiscalité spécifique"],
+    warning: "💡 Si votre projet génère des revenus personnels, l'association n'est pas la bonne structure. Envisagez plutôt une EI ou une société.",
+    nextTools: []
+  },
+  r_scop: {
+    color: "purple",
+    name: "SCOP",
+    subtitle: "Société Coopérative et Participative",
+    tags: ["Coopérative", "Salariés associés", "Gouvernance démocratique"],
+    desc: "La SCOP est une société où les salariés sont majoritairement associés et participent aux décisions selon le principe 1 personne = 1 voix. Les bénéfices sont partagés entre réserves, dividendes et participation des salariés.",
+    pros: ["Gouvernance démocratique (1 voix = 1 personne)", "Partage des bénéfices avec les salariés", "Valeurs coopératives et solidaires", "Peut prendre forme SA, SAS ou SARL"],
+    cons: ["Fonctionnement plus complexe", "Prise de décision collective (peut être lente)", "Moins adaptée aux startups classiques", "Accompagnement spécialisé nécessaire"],
+    warning: "💡 Pour une SCOP, contactez l'Union Régionale des SCOP la plus proche de chez vous pour un accompagnement spécialisé.",
+    nextTools: []
+  }
+};
+
+// ══════════════════════════════════════════════
+//  MOTEUR DU QUIZ
+// ══════════════════════════════════════════════
+
+let history = [];
+let currentNode = 'q1';
+
+function render(nodeId) {
+  currentNode = nodeId;
+  const area = document.getElementById('quiz-area');
+  const backBtn = document.getElementById('back-btn');
+
+  backBtn.style.display = history.length > 0 ? 'inline-flex' : 'none';
+
+  if (nodeId.startsWith('r_')) {
+    renderResult(nodeId);
+    document.getElementById('progress-fill').style.width = '100%';
+    document.getElementById('progress-label').textContent = '✅ Recommandation prête';
+    return;
+  }
+
+  const node = TREE[nodeId];
+  document.getElementById('progress-fill').style.width = node.progress + '%';
+  document.getElementById('progress-label').textContent = 'Étape ' + node.label;
+
+  area.innerHTML = `
+    <div class="question-card">
+      <div class="question-tag">${node.tag}</div>
+      <div class="question-text">${node.question}</div>
+      <div class="question-sub">${node.sub}</div>
+      <div class="answers">
+        ${node.answers.map((a, i) => `
+          <button class="answer-btn" onclick="choose('${a.next}')">
+            <div class="btn-icon">${a.icon}</div>
+            <div class="btn-text">
+              <span class="btn-label">${a.label}</span>
+              <span class="btn-hint">${a.hint}</span>
+            </div>
+            <div class="btn-arrow">›</div>
+          </button>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function renderResult(nodeId) {
+  const r = RESULTS[nodeId];
+  const area = document.getElementById('quiz-area');
+  area.innerHTML = `
+    <div class="result-card ${r.color}">
+      <div class="result-badge">✅ Notre recommandation</div>
+      <div class="result-name">${r.name}</div>
+      <div class="result-subtitle">${r.subtitle}</div>
+      <div class="result-tags">${r.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      <div class="result-desc">${r.desc}</div>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>✓ Points forts</h4>
+          <ul>${r.pros.map(p => `<li>${p}</li>`).join('')}</ul>
+        </div>
+        <div class="cons">
+          <h4>✗ Points de vigilance</h4>
+          <ul>${r.cons.map(c => `<li>${c}</li>`).join('')}</ul>
+        </div>
+      </div>
+      ${r.warning ? `<div class="warning-box">${r.warning}</div>` : ''}
+      <div class="result-actions">
+        <button class="btn-secondary" onclick="restart()">🔄 Recommencer</button>
+        ${r.nextTools.map(t => `<a href="${t.href}" class="btn-primary">${t.label}</a>`).join('')}
+        <a href="index.html" class="btn-secondary">🏠 Accueil</a>
+      </div>
+    </div>`;
+}
+
+function choose(nextId) {
+  history.push(currentNode);
+  render(nextId);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBack() {
+  if (history.length > 0) {
+    const prev = history.pop();
+    render(prev);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function restart() {
+  history = [];
+  render('q1');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Init
+render('q1');
+</script>
+</body>
+</html>
