@@ -663,11 +663,14 @@ function renderYearResults() {
   const data = simulationResults[currentYear - 1];
   if (!data) return;
 
-  // Construire les scores uniquement sur les régimes actifs
+  // Micro applicable uniquement si elle existe ET que le plafond n'est pas dépassé
+  const microOk = data.micro && !data.micro.exceeds;
+
+  // Construire les scores uniquement sur les régimes actifs et applicables
   const nets = {};
-  if (data.micro) nets.micro = data.micro.net;
-  if (data.ir)    nets.ir    = data.ir.net;
-  if (data.is)    nets.is    = data.is.revenuTotal;
+  if (microOk)  nets.micro = data.micro.net;
+  if (data.ir)  nets.ir    = data.ir.net;
+  if (data.is)  nets.is    = data.is.revenuTotal;
 
   const winner = Object.keys(nets).length
     ? Object.entries(nets).reduce((a, b) => a[1] > b[1] ? a : b)[0]
@@ -677,19 +680,23 @@ function renderYearResults() {
   const grid = document.getElementById('results-grid');
   grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
 
+  const microDisabledMsg = data.micro && data.micro.exceeds
+    ? `Plafond dépassé — votre CA (${fmt(data.ca)}) dépasse la limite micro de ${fmt(data.micro.cfg.maxCA)}. Ce régime n'est plus applicable.`
+    : null;
+
   grid.innerHTML = [
-    data.micro ? renderMicroCard(data, winner === 'micro') : renderMicroCardDisabled(),
-    data.ir    ? renderIRCard(data, winner === 'ir')       : renderIRCardDisabled(),
-    data.is    ? renderISCard(data, winner === 'is')       : ''
+    microOk ? renderMicroCard(data, winner === 'micro') : renderMicroCardDisabled(microDisabledMsg),
+    data.ir  ? renderIRCard(data, winner === 'ir')      : renderIRCardDisabled(),
+    data.is  ? renderISCard(data, winner === 'is')      : ''
   ].join('');
 
   // ---- BARS (uniquement les régimes actifs) ----
   const maxNet = Math.max(...Object.values(nets), 1);
   const bars = document.getElementById('bars-container');
   bars.innerHTML = [
-    data.micro ? renderBar('Micro-Entreprise', data.micro.net, maxNet, 'micro') : renderBarDisabled('Micro-Entreprise'),
-    data.ir    ? renderBar('EI Réel (IR)',     data.ir.net,    maxNet, 'ir')    : renderBarDisabled('EI Réel (IR)'),
-    data.is    ? renderBar(data.is.divStrategy === 'keep' ? 'IS (salaire + valeur société)' : 'IS (salaire + dividendes)', data.is.revenuTotal, maxNet, 'is') : ''
+    microOk  ? renderBar('Micro-Entreprise', data.micro.net, maxNet, 'micro') : renderBarDisabled('Micro-Entreprise'),
+    data.ir  ? renderBar('EI Réel (IR)',     data.ir.net,    maxNet, 'ir')    : renderBarDisabled('EI Réel (IR)'),
+    data.is  ? renderBar(data.is.divStrategy === 'keep' ? 'IS (salaire + valeur société)' : 'IS (salaire + dividendes)', data.is.revenuTotal, maxNet, 'is') : ''
   ].join('');
 }
 
@@ -713,12 +720,13 @@ function renderMicroCard(data, isWinner) {
     </div>`;
 }
 
-function renderMicroCardDisabled() {
+function renderMicroCardDisabled(msg) {
+  const defaultMsg = "La micro-entreprise n'est pas compatible avec une structure sociétaire (SASU, SAS, EURL, SARL).<br><br>Ce régime est réservé aux Entreprises Individuelles.";
   return `
     <div class="res-card micro disabled">
       <div class="res-title">🟢 Micro-Entreprise</div>
       <div class="not-applicable-badge">🚫 Non applicable</div>
-      <p class="disabled-msg">La micro-entreprise n'est pas compatible avec une structure sociétaire (SASU, SAS, EURL, SARL).<br><br>Ce régime est réservé aux Entreprises Individuelles.</p>
+      <p class="disabled-msg">${msg || defaultMsg}</p>
     </div>`;
 }
 
@@ -803,7 +811,7 @@ function renderRecommendation() {
   if (!data) return;
 
   const scores = {};
-  if (data.micro) scores.micro = data.micro.netApresIRPP;
+  if (data.micro && !data.micro.exceeds) scores.micro = data.micro.netApresIRPP;
   if (data.ir)    scores.ir    = data.ir.netApresIRPP;
   if (data.is)    scores.is    = data.is.revenuTotal;
 
