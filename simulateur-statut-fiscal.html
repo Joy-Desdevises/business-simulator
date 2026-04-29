@@ -155,6 +155,16 @@ nav { background: #1e3a5f; padding: 0 32px; display: flex; align-items: center; 
 .note-rate { font-size: 0.72rem; color: #a0aec0; font-style: italic; margin-top: 4px; }
 
 .section-sub { font-size: 0.8rem; color: #718096; margin-bottom: 14px; margin-top: -10px; }
+
+/* Disabled (non-applicable) regime cards */
+.res-card.disabled { background: #f7f8fa !important; border: 2px dashed #cbd5e0 !important; opacity: 0.72; pointer-events: none; }
+.res-card.disabled .res-title { color: #a0aec0 !important; text-decoration: line-through; }
+.res-card.disabled .metric-val,
+.res-card.disabled .metric-label { color: #b0bec5 !important; }
+.res-card.disabled .highlight-row { background: #edf2f7; }
+.not-applicable-badge { display: inline-flex; align-items: center; gap: 6px; background: #fed7d7; color: #c53030; font-size: 0.72rem; font-weight: 700; padding: 5px 12px; border-radius: 20px; margin-bottom: 12px; }
+.disabled-msg { font-size: 0.8rem; color: #a0aec0; font-style: italic; margin-top: 12px; line-height: 1.5; text-align: center; }
+.bar-fill.disabled-bar { background: #cbd5e0 !important; }
 </style>
 </head>
 <body>
@@ -663,24 +673,22 @@ function renderYearResults() {
     ? Object.entries(nets).reduce((a, b) => a[1] > b[1] ? a : b)[0]
     : null;
 
-  // ---- CARDS ----
+  // ---- CARDS — toujours 3 colonnes, régimes non-actifs affichés en "désactivé" ----
   const grid = document.getElementById('results-grid');
-  // Ajuster la grille selon le nombre de régimes affichés
-  const count = Object.keys(nets).length;
-  grid.style.gridTemplateColumns = count === 1 ? '1fr' : count === 2 ? '1fr 1fr' : 'repeat(3, 1fr)';
+  grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
 
   grid.innerHTML = [
-    data.micro ? renderMicroCard(data, winner === 'micro') : '',
-    data.ir    ? renderIRCard(data, winner === 'ir')       : '',
+    data.micro ? renderMicroCard(data, winner === 'micro') : renderMicroCardDisabled(),
+    data.ir    ? renderIRCard(data, winner === 'ir')       : renderIRCardDisabled(),
     data.is    ? renderISCard(data, winner === 'is')       : ''
   ].join('');
 
-  // ---- BARS ----
+  // ---- BARS (uniquement les régimes actifs) ----
   const maxNet = Math.max(...Object.values(nets), 1);
   const bars = document.getElementById('bars-container');
   bars.innerHTML = [
-    data.micro ? renderBar('Micro-Entreprise', data.micro.net, maxNet, 'micro') : '',
-    data.ir    ? renderBar('EI Réel (IR)',     data.ir.net,    maxNet, 'ir')    : '',
+    data.micro ? renderBar('Micro-Entreprise', data.micro.net, maxNet, 'micro') : renderBarDisabled('Micro-Entreprise'),
+    data.ir    ? renderBar('EI Réel (IR)',     data.ir.net,    maxNet, 'ir')    : renderBarDisabled('EI Réel (IR)'),
     data.is    ? renderBar(data.is.divStrategy === 'keep' ? 'IS (salaire + valeur société)' : 'IS (salaire + dividendes)', data.is.revenuTotal, maxNet, 'is') : ''
   ].join('');
 }
@@ -702,6 +710,35 @@ function renderMicroCard(data, isWinner) {
       <div class="metric-row"><span class="metric-label">IRPP estimé*</span><span class="metric-val orange">− ${fmt(m.irpp)}</span></div>
       <div class="highlight-row metric-row"><span class="metric-label">Net après IRPP*</span><span class="metric-val green">${fmt(m.netApresIRPP)}</span></div>
       <div style="font-size:0.72rem;color:#718096;margin-top:6px;">Taux cotis. : ${(m.cfg.cotis * 100).toFixed(1)}% du CA • Abattement fiscal : ${m.cfg.abattLabel}</div>
+    </div>`;
+}
+
+function renderMicroCardDisabled() {
+  return `
+    <div class="res-card micro disabled">
+      <div class="res-title">🟢 Micro-Entreprise</div>
+      <div class="not-applicable-badge">🚫 Non applicable</div>
+      <p class="disabled-msg">La micro-entreprise n'est pas compatible avec une structure sociétaire (SASU, SAS, EURL, SARL).<br><br>Ce régime est réservé aux Entreprises Individuelles.</p>
+    </div>`;
+}
+
+function renderIRCardDisabled() {
+  return `
+    <div class="res-card ir disabled">
+      <div class="res-title">🟠 EI Réel (IR)</div>
+      <div class="not-applicable-badge">🚫 Non applicable</div>
+      <p class="disabled-msg">Le régime EI au réel (IR) n'est pas disponible pour une société. Il est réservé aux Entreprises Individuelles.</p>
+    </div>`;
+}
+
+function renderBarDisabled(label) {
+  return `
+    <div class="bar-row">
+      <div class="bar-label" style="color:#a0aec0;">${label}</div>
+      <div class="bar-track">
+        <div class="bar-fill disabled-bar" style="width:15%"></div>
+      </div>
+      <div class="bar-amount" style="color:#a0aec0;">N/A</div>
     </div>`;
 }
 
@@ -811,7 +848,7 @@ function renderNotes() {
   const act = document.querySelector('input[name="activity"]:checked')?.value || 'service';
   const cfg = ACTIVITY_CONFIG[act];
   const data = simulationResults[0];
-  const microExceeds = simulationResults.some(r => r.micro.exceeds);
+  const microExceeds = simulationResults.some(r => r.micro && r.micro.exceeds);
 
   let notes = `
     <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;">
@@ -819,6 +856,7 @@ function renderNotes() {
       <li>📌 <strong>EI Réel :</strong> Toutes vos charges sont déductibles. Les cotisations TNS (~45% du revenu net) sont également déductibles. Comptabilité obligatoire.</li>
       <li>📌 <strong>IS :</strong> La société est une entité juridique séparée. Vous choisissez votre rémunération. Le bénéfice restant dans la société est taxé à 15% (≤ 42 500 €) puis 25%. Les dividendes sont soumis à la flat tax de 30%.</li>
       ${microExceeds ? '<li>⚠️ <strong>Attention :</strong> Votre CA dépasse le plafond micro sur certaines années. Vous devrez basculer en régime réel automatiquement.</li>' : ''}
+      ${!data.strCfg.showMicro ? '<li>ℹ️ <strong>Micro non affichée :</strong> Ce régime n\'est pas compatible avec votre structure sociétaire. La comparaison porte uniquement sur les régimes applicables.</li>' : ''}
       <li>💡 <strong>IRPP :</strong> L\'estimation est calculée pour un célibataire sans autre revenu. Votre impôt réel dépend de votre situation familiale et de vos autres revenus.</li>
       <li>💡 <strong>Dividendes IS :</strong> Si vous conservez du bénéfice en société, il peut être distribué plus tard sous forme de dividendes (flat tax 30%) ou via un PEA/compte-titres optimisé.</li>
       <li>🔍 <strong>ACRE :</strong> En cas d'ACRE, les cotisations micro de la 1ère année sont réduites de 50%.</li>
